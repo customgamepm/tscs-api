@@ -13,6 +13,7 @@ const sequelize = new Sequelize({
 
 // 2. Define our schema
 class Course extends Model {}
+class User extends Model {}
 
 Course.init({
     name: {
@@ -22,10 +23,43 @@ Course.init({
     }
 }, { sequelize, modelName: 'course' })
 
+User.init({
+    username: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true
+    },
+    password: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: false
+    },
+    first_name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: false
+    },
+    last_name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: false
+    },
+    email_address: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: false
+    },
+    role: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        unique: false
+    }
+}, { sequelize, modelName: 'user' })
+
 // { sequelize } --> { sequelize: sequelize }
 
 // "Sync" our sequelize with our database
-sequelize.sync();
+sequelize.sync({ alter: true });
 
 // Server Configuration
 
