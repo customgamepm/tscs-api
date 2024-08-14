@@ -1,60 +1,34 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const { Sequelize, Model, DataTypes } = require('sequelize');
+const { Model, DataTypes } = require('sequelize');
 
 // Database Configuration
 
 // 1. Create Sequelize instance
-const sequelize = new Sequelize({
-    dialect: 'sqlite',
-    storage: './database.sqlite3'
-})
+const sequelize = require('./config/database');
+// import { sequelize } from './config/database';
 
 // 2. Define our schema
-class Course extends Model {}
-class User extends Model {}
+const AccountType = require('./src/models/AccountType');
+const User = require('./src/models/User');
+// class Course extends Model {}
+// class User extends Model {}
 
-Course.init({
-    name: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true
-    }
-}, { sequelize, modelName: 'course' })
+// 3. Define associations
+AccountType.hasMany(User, { foreignKey: 'account_type_id' });
+User.belongsTo(AccountType, {as: 'accountType', foreignKey: 'account_type_id' });
 
-User.init({
-    username: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true
-    },
-    password: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: false
-    },
-    first_name: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: false
-    },
-    last_name: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: false
-    },
-    email_address: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: false
-    },
-    role: {
-        type: DataTypes.STRING,
-        allowNull: true,
-        unique: false
-    }
-}, { sequelize, modelName: 'user' })
+// Course.init({
+//     name: {
+//         type: DataTypes.STRING,
+//         allowNull: false,
+//         unique: true
+//     }
+// }, { sequelize, modelName: 'course' });
+
+// const User = require('./src/models/User');
+// const Auth = require('./src/models/Auth');
 
 // { sequelize } --> { sequelize: sequelize }
 
@@ -69,16 +43,24 @@ const port = 3000;
 const app = express();
 
 // MIDDLEWARE
+app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-app.use(cors());
+const AuthController = require('./src/controllers/AuthController');
+const UsersController = require('./src/controllers/UsersController');
+const SchedulesController = require('./src/controllers/SchedulesController');
+const AccountTypesController = require('./src/controllers/AccountTypesController');
+app.use(AuthController);
+app.use(UsersController);
+app.use(SchedulesController);
+app.use(AccountTypesController);
 
 // Services
-app.get("/", (req, res) => {
+// app.get("/", (req, res) => {
 
-    let payload = { message: "Welcome to student portal!" };
-    res.json(payload);
-})
+//     let payload = { message: "Welcome to student portal!" };
+//     res.json(payload);
+// })
 
 // Run the server
 app.listen(port, () => {
